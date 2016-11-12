@@ -14,7 +14,6 @@ public class MainTest {
         list.add(2);
         list.add(5);
         list.add(3);
-        list.add(3);
 
         ArrayList<Integer> list1 = list.toArrayList();
         System.out.println("list1 = " + list1);

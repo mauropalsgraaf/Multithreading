@@ -54,11 +54,15 @@ public class CoarseGrainedList<T extends Comparable<T>> implements Sorted<T> {
 
         while (nodeToCompare != null) {
             int nodeComparator = value.compareTo(nodeToCompare.getValue());
+
             if (nodeComparator == 0) {
                 previous.setNext(nodeToCompare.getNext());
+
+                nodeToCompare = previous.getNext();
+                continue;
             }
 
-            if (nodeComparator < 0) { //The items are smaller at this point, so we can omit the rest
+            if (nodeComparator < 0) {
                 return;
             }
 
