@@ -11,7 +11,6 @@ public class CoarseGrainedTree<T extends Comparable<T>> implements Sorted<T> {
     private Node<T> right;
 
     public void add(T t) {
-
     }
 
     public void remove(T t) {

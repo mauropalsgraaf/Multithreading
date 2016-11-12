@@ -1,6 +1,8 @@
 package data_structures.implementation;
 
 import java.util.ArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import data_structures.Sorted;
 import data_structures.implementation.coarsegrainedlist.Node;
@@ -8,66 +10,79 @@ import data_structures.implementation.coarsegrainedlist.Node;
 public class CoarseGrainedList<T extends Comparable<T>> implements Sorted<T> {
 
     private Node<T> head;
+    private Lock lock = new ReentrantLock();
 
     public void add(T value) {
-        Node<T> nodeToAdd = new Node<>(value);
+        lock.lock();
 
-        if (head == null) { //if list is empty
-            head = nodeToAdd;
+        try {
+            Node<T> nodeToAdd = new Node<>(value);
 
-            return;
-        }
-
-        if (value.compareTo(head.getValue()) <= 0) { //if item to add is smaller or equal to head, just add it in front
-            nodeToAdd.setNext(head);
-            head = nodeToAdd;
-
-            return;
-        }
-
-        Node<T> previous = head;
-        Node<T> nodeToCompare = head.getNext();
-
-        while (nodeToCompare != null) {
-
-            if (value.compareTo(nodeToCompare.getValue()) <= 0) {
-                previous.setNext(nodeToAdd);
-                nodeToAdd.setNext(nodeToCompare);
+            if (head == null) { //if list is empty
+                head = nodeToAdd;
 
                 return;
             }
 
-            previous = nodeToCompare;
-            nodeToCompare = nodeToCompare.getNext();
-        }
+            if (value.compareTo(head.getValue()) <= 0) { //if item to add is smaller or equal to head, just add it in front
+                nodeToAdd.setNext(head);
+                head = nodeToAdd;
 
-        previous.setNext(nodeToAdd);
+                return;
+            }
+
+            Node<T> previous = head;
+            Node<T> nodeToCompare = head.getNext();
+
+            while (nodeToCompare != null) {
+
+                if (value.compareTo(nodeToCompare.getValue()) <= 0) {
+                    previous.setNext(nodeToAdd);
+                    nodeToAdd.setNext(nodeToCompare);
+
+                    return;
+                }
+
+                previous = nodeToCompare;
+                nodeToCompare = nodeToCompare.getNext();
+            }
+
+            previous.setNext(nodeToAdd);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void remove(T value) {
-        while (head.getValue().compareTo(value) == 0) {
-            head = head.getNext();
-        }
+        lock.lock();
 
-        Node<T> previous = head;
-        Node<T> nodeToCompare = head.getNext();
-
-        while (nodeToCompare != null) {
-            int nodeComparator = value.compareTo(nodeToCompare.getValue());
-
-            if (nodeComparator == 0) {
-                previous.setNext(nodeToCompare.getNext());
-
-                nodeToCompare = previous.getNext();
-                continue;
+        try {
+            while (head.getValue().compareTo(value) == 0) {
+                head = head.getNext();
             }
 
-            if (nodeComparator < 0) {
-                return;
-            }
+            Node<T> previous = head;
+            Node<T> nodeToCompare = head.getNext();
 
-            previous = previous.getNext();
-            nodeToCompare = nodeToCompare.getNext();
+            while (nodeToCompare != null) {
+                int nodeComparator = value.compareTo(nodeToCompare.getValue());
+
+                if (nodeComparator == 0) {
+                    previous.setNext(nodeToCompare.getNext());
+
+                    nodeToCompare = previous.getNext();
+                    continue;
+                }
+
+                if (nodeComparator < 0) {
+                    return;
+                }
+
+                previous = previous.getNext();
+                nodeToCompare = nodeToCompare.getNext();
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
