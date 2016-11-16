@@ -57,8 +57,12 @@ public class CoarseGrainedList<T extends Comparable<T>> implements Sorted<T> {
         lock.lock();
 
         try {
-            while (head.getValue().compareTo(value) == 0) {
+            while (head != null && head.getValue().compareTo(value) == 0) {
                 head = head.getNext();
+            }
+
+            if (head == null) {
+                return;
             }
 
             Node<T> previous = head;
