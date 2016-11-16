@@ -3,6 +3,8 @@ package data_structures.implementation;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import data_structures.Sorted;
 
@@ -10,9 +12,17 @@ import data_structures.Sorted;
 public class CoarseGrainedTree<T extends Comparable<T>> implements Sorted<T> {
 
     private Node root;
+    private Lock lock = new ReentrantLock();
+
 
     public void add(T value) {
-    	root = add(root, element);
+    	lock.lock;
+    	
+    	try {
+    		root = add(root, element);
+    	} finally {
+    		lock.unlock();
+    	}
     }
     
     /**
@@ -33,7 +43,13 @@ public class CoarseGrainedTree<T extends Comparable<T>> implements Sorted<T> {
     }
 
     public void remove(T value) {
-        root = remove(root, value);
+    	lock.lock;
+    	
+    	try {
+    		root = remove(root, value);
+    	} finally {
+    		lock.unlock();
+    	}
     }
     
     private Node remove(Node node, T value) {
