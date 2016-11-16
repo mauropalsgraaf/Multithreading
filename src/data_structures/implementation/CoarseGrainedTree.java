@@ -16,10 +16,10 @@ public class CoarseGrainedTree<T extends Comparable<T>> implements Sorted<T> {
 
 
     public void add(T value) {
-    	lock.lock;
-    	
+    	lock.lock();
+        
     	try {
-    		root = add(root, element);
+    		root = add(root, value);
     	} finally {
     		lock.unlock();
     	}
@@ -43,7 +43,7 @@ public class CoarseGrainedTree<T extends Comparable<T>> implements Sorted<T> {
     }
 
     public void remove(T value) {
-    	lock.lock;
+    	lock.lock();
     	
     	try {
     		root = remove(root, value);
@@ -57,7 +57,7 @@ public class CoarseGrainedTree<T extends Comparable<T>> implements Sorted<T> {
     		node.left = remove(node.left, value);
     	} else if (value.compareTo(node.value) > 0) {
     		node.right = remove(node.right, value);
-    	} else if (node.left != nul && node.right != null) {
+    	} else if (node.left != null && node.right != null) {
     		node.value = findMaximum(node.left);
     		node.left = remove(node.left, node.value);
     	} else {
@@ -69,14 +69,14 @@ public class CoarseGrainedTree<T extends Comparable<T>> implements Sorted<T> {
     
     private T findMaximum(Node node) {
     	if (node.right == null) {
-    		return node.data
+    		return node.value;
     	} else {
     		return findMaximum(node.right);
     	}
     }
 
     public ArrayList<T> toArrayList() {
-        List<T> result = new ArrayList<>();
+        ArrayList<T> result = new ArrayList<>();
         
         populateAscendingArrayList(root, result);
         
@@ -86,7 +86,7 @@ public class CoarseGrainedTree<T extends Comparable<T>> implements Sorted<T> {
     public void populateAscendingArrayList(Node node, List<T> list) {
     	if (node != null) {
     		populateAscendingArrayList(node.left, list);
-    		list.add(note.data);
+    		list.add(node.value);
     		populateAscendingArrayList(node.right, list);
     	}
     }
@@ -103,11 +103,11 @@ public class CoarseGrainedTree<T extends Comparable<T>> implements Sorted<T> {
     		this.right = null;
     	}
     	
-    	public Node(T value) {
+    	Node(T value) {
     		this(value, null, null);
     	}
     	
-    	public Node(E value, Node left, Node right) {
+    	Node(T value, Node left, Node right) {
     		this.value = value;
     		this.left = left; 
     		this.right = right;

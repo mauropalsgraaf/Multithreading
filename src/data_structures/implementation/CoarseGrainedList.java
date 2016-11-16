@@ -5,7 +5,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import data_structures.Sorted;
-import data_structures.implementation.coarsegrainedlist.Node;
 
 public class CoarseGrainedList<T extends Comparable<T>> implements Sorted<T> {
 	
