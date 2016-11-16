@@ -8,9 +8,30 @@ import data_structures.Sorted;
 import data_structures.implementation.coarsegrainedlist.Node;
 
 public class CoarseGrainedList<T extends Comparable<T>> implements Sorted<T> {
-
+	
     private Node<T> head;
     private Lock lock = new ReentrantLock();
+    
+    private class Node<T> {
+        private Node<T> next;
+        private T value;
+
+        public Node(T value) {
+            this.value = value;
+        }
+
+        public void setNext(Node<T> next) {
+            this.next = next;
+        }
+
+        public Node<T> getNext() {
+            return next;
+        }
+
+        public T getValue() {
+            return value;
+        }
+    }
 
     public void add(T value) {
         lock.lock();
