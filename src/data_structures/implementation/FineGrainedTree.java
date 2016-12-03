@@ -22,6 +22,8 @@ public class FineGrainedTree<T extends Comparable<T>> implements Sorted<T> {
      * Recursive function for adding a value as a node in a BST
      */
     private void add(Node node, T value, Node parent) {
+        //discuss in person
+
         node.lock();
 
         if (parent != null) {
@@ -65,15 +67,56 @@ public class FineGrainedTree<T extends Comparable<T>> implements Sorted<T> {
         remove(root, value, null);
     }
 
-    private Node remove(Node node, T value, Node parent) {
-        
+    private void remove(Node node, T value, Node parent) {
+        node.lock();
+
+        if (value.compareTo(node.value) < 0) {
+
+            if (node.left == null) {
+                node.unlock();
+
+                return;
+            }
+
+            remove(node.left, value, node);
+
+        } else if (value.compareTo(node.value) > 0) {
+
+            if (node.right == null) {
+                node.unlock();
+
+                return;
+            }
+
+            remove(node.right, value, node);
+
+        } else if (node.left != null && node.right != null) {
+
+            node.setValue(findMaximum(node.left));
+
+            remove(node.left, node.value, node);
+
+        } else {
+            if (parent.value.compareTo(node.value) < 0) {
+                parent.right = node.left != null ? node.left : node.right;
+            }
+            else {
+                parent.left = node.left != null ? node.left : node.right;
+            }
+        }
     }
 
     private T findMaximum(Node node) {
-        if (node.right == null) {
-            return node.value;
-        } else {
-            return findMaximum(node.right);
+        node.lock();
+
+        try {
+            if (node.right == null) {
+                return node.value;
+            } else {
+                return findMaximum(node.right);
+            }
+        } finally {
+            node.unlock();
         }
     }
 
