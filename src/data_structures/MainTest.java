@@ -1,13 +1,16 @@
 package data_structures;
 
 import data_structures.implementation.CoarseGrainedList;
+import data_structures.implementation.FineGrainedList;
 
 import java.util.ArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class MainTest {
 
     public static void main(String[] args) {
-        CoarseGrainedList<Integer> list = new CoarseGrainedList<>();
+        FineGrainedList<Integer> list = new FineGrainedList<>();
 
         ArrayList<Integer> list1 = list.toArrayList();
 

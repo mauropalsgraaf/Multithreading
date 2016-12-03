@@ -9,35 +9,103 @@ import data_structures.Sorted;
 public class FineGrainedList<T extends Comparable<T>> implements Sorted<T> {
 
     private Node<T> head;
+    private Node<T> tail;
+
+    public FineGrainedList() {
+        this.head = new Node<>(null);
+        this.tail = new Node<>(null);
+
+        this.head.setNext(tail);
+    }
 
     public void add(T value) {
         Node<T> nodeToAdd = new Node<>(value);
 
+        head.lock();
         Node<T> previous = head;
-        Node<T> nodeToCompare = head.getNext();
 
-        while (nodeToCompare != null) {
-            if (value.compareTo(nodeToCompare.getValue()) <= 0) {
+        try {
+            Node<T> nodeToCompare = head.getNext();
+            nodeToCompare.lock();
+
+            try {
+                //Continue till the nodeToCompare is tail, there are several ways to jump out in the while loop.
+                while (!nodeToCompare.equals(this.tail)) {
+
+                    if (value.compareTo(nodeToCompare.getValue()) <= 0) {
+                        previous.setNext(nodeToAdd);
+                        nodeToAdd.setNext(nodeToCompare);
+
+                        return;
+                    }
+
+                    previous.unlock();
+                    previous = nodeToCompare;
+                    nodeToCompare = nodeToCompare.getNext();
+                    nodeToCompare.lock();
+                }
+
+                //If the item is the last in the list, connect the previous to nodeToAdd and nodeToAdd to tail
                 previous.setNext(nodeToAdd);
                 nodeToAdd.setNext(nodeToCompare);
 
-                return;
+            } finally {
+                nodeToCompare.unlock();
             }
-
-            previous = nodeToCompare;
-            nodeToCompare = nodeToCompare.getNext();
+        } finally {
+            previous.unlock();
         }
-
-        previous.setNext(nodeToAdd);
-
     }
 
     public void remove(T value) {
-        throw new UnsupportedOperationException();
+        Node<T> previous = null, nodeToCompare = null;
+        head.lock();
+
+        try {
+            previous = head;
+            nodeToCompare = head.getNext();
+            nodeToCompare.lock();
+
+            try {
+                while (!nodeToCompare.equals(this.tail)) {
+                    int nodeComparator = value.compareTo(nodeToCompare.getValue());
+
+                    if (nodeComparator == 0) {
+                        previous.setNext(nodeToCompare.getNext());
+
+                        return;
+                    }
+
+                    if (nodeComparator < 0) {
+                        return;
+                    }
+
+                    previous.unlock();
+                    previous = nodeToCompare;
+                    nodeToCompare = nodeToCompare.getNext();
+                    nodeToCompare.lock();
+                }
+            } finally {
+                nodeToCompare.unlock();
+            }
+        } finally {
+            previous.unlock();
+        }
+
     }
 
     public ArrayList<T> toArrayList() {
-        throw new UnsupportedOperationException();
+        ArrayList<T> list = new ArrayList<>();
+
+        Node<T> nodeToCompare = head.getNext();
+
+        while (nodeToCompare != null && nodeToCompare != tail) {
+            list.add(nodeToCompare.getValue());
+
+            nodeToCompare = nodeToCompare.getNext();
+        }
+
+        return list;
     }
 
     private class Node<T> {
