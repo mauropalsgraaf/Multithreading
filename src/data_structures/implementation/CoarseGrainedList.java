@@ -8,49 +8,14 @@ import data_structures.Sorted;
 
 public class CoarseGrainedList<T extends Comparable<T>> implements Sorted<T> {
 	
-    private Node<T> head;
+    private Node<T> head = new Node<>(null);
     private Lock lock = new ReentrantLock();
-    
-    private class Node<T> {
-        private Node<T> next;
-        private T value;
-
-        public Node(T value) {
-            this.value = value;
-        }
-
-        public void setNext(Node<T> next) {
-            this.next = next;
-        }
-
-        public Node<T> getNext() {
-            return next;
-        }
-
-        public T getValue() {
-            return value;
-        }
-    }
 
     public void add(T value) {
+        Node<T> nodeToAdd = new Node<>(value);
+
         lock.lock();
-
         try {
-            Node<T> nodeToAdd = new Node<>(value);
-
-            if (head == null) { //if list is empty
-                head = nodeToAdd;
-
-                return;
-            }
-
-            if (value.compareTo(head.getValue()) <= 0) { //if item to add is smaller or equal to head, just add it in front
-                nodeToAdd.setNext(head);
-                head = nodeToAdd;
-
-                return;
-            }
-
             Node<T> previous = head;
             Node<T> nodeToCompare = head.getNext();
 
@@ -77,14 +42,6 @@ public class CoarseGrainedList<T extends Comparable<T>> implements Sorted<T> {
         lock.lock();
 
         try {
-            while (head != null && head.getValue().compareTo(value) == 0) {
-                head = head.getNext();
-            }
-
-            if (head == null) {
-                return;
-            }
-
             Node<T> previous = head;
             Node<T> nodeToCompare = head.getNext();
 
@@ -94,15 +51,14 @@ public class CoarseGrainedList<T extends Comparable<T>> implements Sorted<T> {
                 if (nodeComparator == 0) {
                     previous.setNext(nodeToCompare.getNext());
 
-                    nodeToCompare = previous.getNext();
-                    continue;
+                    return;
                 }
 
                 if (nodeComparator < 0) {
                     return;
                 }
 
-                previous = previous.getNext();
+                previous = nodeToCompare;
                 nodeToCompare = nodeToCompare.getNext();
             }
         } finally {
@@ -112,11 +68,6 @@ public class CoarseGrainedList<T extends Comparable<T>> implements Sorted<T> {
 
     public ArrayList<T> toArrayList() {
         ArrayList<T> list = new ArrayList<>();
-        if (head == null) {
-            return list;
-        }
-
-        list.add(head.getValue());
 
         Node<T> nodeToCompare = head.getNext();
 
@@ -127,5 +78,26 @@ public class CoarseGrainedList<T extends Comparable<T>> implements Sorted<T> {
         }
 
         return list;
+    }
+
+    private class Node<T> {
+        private Node<T> next;
+        private T value;
+
+        public Node(T value) {
+            this.value = value;
+        }
+
+        public void setNext(Node<T> next) {
+            this.next = next;
+        }
+
+        public Node<T> getNext() {
+            return next;
+        }
+
+        public T getValue() {
+            return value;
+        }
     }
 }
