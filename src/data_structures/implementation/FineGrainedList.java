@@ -58,7 +58,7 @@ public class FineGrainedList<T extends Comparable<T>> implements Sorted<T> {
     }
 
     public void remove(T value) {
-        Node<T> previous = null, nodeToCompare = null;
+        Node<T> previous = null, nodeToCompare;
         head.lock();
 
         try {

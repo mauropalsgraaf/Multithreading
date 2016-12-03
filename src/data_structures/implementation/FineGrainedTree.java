@@ -23,6 +23,11 @@ public class FineGrainedTree<T extends Comparable<T>> implements Sorted<T> {
      */
     private void add(Node node, T value, Node parent) {
         node.lock();
+
+        if (parent != null) {
+            parent.unlock();
+        }
+
         if (node.getValue() == null) {
             node.setValue(value);
 
@@ -43,53 +48,25 @@ public class FineGrainedTree<T extends Comparable<T>> implements Sorted<T> {
 
             add(node.left, value, node);
         } else {
+            if (node.right == null) {
+                node.right = nodeToAdd;
+
+                node.unlock();
+
+                return;
+            }
+
             add(node.right, value, node);
         }
-
-//        node.lock();
-//
-//        if (parent != null) {
-//            parent.unlock();
-//        }
-//
-//        if (node.getValue() == null) {
-//            node.unlock();
-//            return new Node(value);
-//        }
-//
-        if (value.compareTo(node.value) <= 0) {
-            node.left = add(node.left, value, node);
-        } else {
-            node.right = add(node.right, value, node);
-        }
-//
-//        return node;
     }
 
 
     public void remove(T value) {
-        lock.lock();
-
-        try {
-            root = remove(root, value);
-        } finally {
-            lock.unlock();
-        }
+        remove(root, value, null);
     }
 
-    private Node remove(Node node, T value) {
-        if (value.compareTo(node.value) < 0) {
-            node.left = remove(node.left, value);
-        } else if (value.compareTo(node.value) > 0) {
-            node.right = remove(node.right, value);
-        } else if (node.left != null && node.right != null) {
-            node.value = findMaximum(node.left);
-            node.left = remove(node.left, node.value);
-        } else {
-            node = node.left != null ? node.left : node.right;
-        }
-
-        return node;
+    private Node remove(Node node, T value, Node parent) {
+        
     }
 
     private T findMaximum(Node node) {
@@ -121,13 +98,12 @@ public class FineGrainedTree<T extends Comparable<T>> implements Sorted<T> {
         private T value;
         private Node left;
         private Node right;
-        private Lock lock;
+        private Lock lock = new ReentrantLock();
 
         public Node() {
             this.value = null;
             this.left = null;
             this.right = null;
-            lock = new ReentrantLock();
         }
 
         Node(T value) {
