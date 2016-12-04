@@ -40,5 +40,27 @@ public class MainTestTree {
 
         list1 = list.toArrayList();
         System.out.println("list1 = " + list1);
+
+        list.remove(3);
+
+        list1 = list.toArrayList();
+        System.out.println("list1 = " + list1);
+
+        list.remove(5);
+
+        list1 = list.toArrayList();
+        System.out.println("list1 = " + list1);
+
+        list.remove(1);
+
+        list1 = list.toArrayList();
+        System.out.println("list1 = " + list1);
+
+        list.remove(3);
+
+        list1 = list.toArrayList();
+        System.out.println("list1 = " + list1);
+
+
     }
 }

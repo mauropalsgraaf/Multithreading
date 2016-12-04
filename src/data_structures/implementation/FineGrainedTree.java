@@ -72,6 +72,10 @@ public class FineGrainedTree<T extends Comparable<T>> implements Sorted<T> {
 
         if (value.compareTo(node.value) < 0) {
 
+            if (parent != null) {
+                parent.unlock();
+            }
+
             if (node.left == null) {
                 node.unlock();
 
@@ -81,6 +85,10 @@ public class FineGrainedTree<T extends Comparable<T>> implements Sorted<T> {
             remove(node.left, value, node);
 
         } else if (value.compareTo(node.value) > 0) {
+
+            if (parent != null) {
+                parent.unlock();
+            }
 
             if (node.right == null) {
                 node.unlock();
@@ -94,15 +102,21 @@ public class FineGrainedTree<T extends Comparable<T>> implements Sorted<T> {
 
             node.setValue(findMaximum(node.left));
 
+            parent.unlock();
+
             remove(node.left, node.value, node);
 
         } else {
+
             if (parent.value.compareTo(node.value) < 0) {
                 parent.right = node.left != null ? node.left : node.right;
             }
             else {
                 parent.left = node.left != null ? node.left : node.right;
             }
+
+            parent.unlock();
+            node.unlock();
         }
     }
 
