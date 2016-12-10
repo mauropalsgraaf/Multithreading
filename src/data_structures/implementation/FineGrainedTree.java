@@ -125,7 +125,19 @@ public class FineGrainedTree<T extends Comparable<T>> implements Sorted<T> {
 
                 parent.unlock();
             } else {
-                root = new Node();
+                if (node.left != null) {
+                    node.value = node.left.value;
+                    node.right = node.left.right;
+                    node.left = node.left.left;
+                } else if (node.right != null) {
+                    node.value = node.right.value;
+                    node.left = node.right.left;
+                    node.right = node.right.right;
+                } else {
+                    node.value = null;
+                }
+
+                node.unlock();
             }
         }
     }
@@ -153,7 +165,7 @@ public class FineGrainedTree<T extends Comparable<T>> implements Sorted<T> {
     }
 
     public void populateAscendingArrayList(Node node, List<T> list) {
-        if (node != null) {
+        if (node != null && node.value != null) {
             populateAscendingArrayList(node.left, list);
             list.add(node.value);
             populateAscendingArrayList(node.right, list);
